@@ -134,30 +134,9 @@ resource "azurerm_virtual_machine_data_disk_attachment" "hcmxexample" {
   caching            = "ReadWrite"
 }
 
-resource "azurerm_public_ip" "hcmxexample" {
-  name                = var.vm_name
-  resource_group_name = data.azurerm_resource_group.hcmxexample.name
-  location            = var.location
-  allocation_method   = "Dynamic"
-  domain_name_label   = var.domain_name_label
-}
-
-resource "azurerm_network_interface" "hcmxexample" {
-  name                = var.vm_name
-  location            = var.location
-  resource_group_name = data.azurerm_resource_group.hcmxexample.name
-
-  ip_configuration {
-    name                          = var.vm_name
-    subnet_id                     = data.azurerm_subnet.hcmxexample.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.hcmxexample.id
-                 }
-  }
-
 # Output variables
 output "public_ip_address" {
-  value = data.azurerm_public_ip.hcmxexample.ip_address
+  value = azurerm_public_ip.hcmxexample.ip_address
 }
 
 output "network_interface_name" {
@@ -165,11 +144,11 @@ output "network_interface_name" {
 }
 
 output "private_ip_address" {
-  value = data.azurerm_network_interface.hcmxexample.private_ip_address
+  value = azurerm_network_interface.hcmxexample.private_ip_address
 }
 
 output "primary_dns_name" {
-  value = data.azurerm_public_ip.hcmxexample.fqdn
+  value = azurerm_public_ip.hcmxexample.fqdn
 }
 
 output "virtual_machine_id" {

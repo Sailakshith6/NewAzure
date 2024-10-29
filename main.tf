@@ -59,7 +59,6 @@ resource "azurerm_network_interface" "hcmxexample" {
 
 # Linux VM configuration
 resource "azurerm_linux_virtual_machine" "hcmxexample" {
-  count               = var.os_type == "linux" ? 1 : 0  # This line was initially incorrect
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location
@@ -75,22 +74,23 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
   }
-  
-  # Conditional image source for Linux
-  source_image_id = var.image_source == "private" ? var.private_image_id : null
 
-  # Only include this block if using a public image
-  source_image_reference {
-    publisher = var.image_source == "public" ? var.publisher : ""
-    offer     = var.image_source == "public" ? var.offer : ""
-    sku       = var.image_source == "public" ? var.sku : ""
-    version   = var.image_source == "public" ? var.os_version : ""
+  # Use conditional logic to set image source
+  dynamic "source_image_reference" {
+    for_each = var.image_source == "public" ? [1] : []
+    content {
+      publisher = var.publisher
+      offer     = var.offer
+      sku       = var.sku
+      version   = var.os_version
+    }
   }
+
+  source_image_id = var.image_source == "private" ? var.private_image_id : null
 }
 
 # Windows VM configuration
 resource "azurerm_windows_virtual_machine" "hcmxexample" {
-  count               = var.os_type == "windows" ? 1 : 0  # This line was initially incorrect
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location
@@ -106,16 +106,18 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
     storage_account_type = var.type_of_storage
   }
 
-  # Conditional image source for Windows
-  source_image_id = var.image_source == "private" ? var.private_image_id : null
-
-  # Only include this block if using a public image
-  source_image_reference {
-    publisher = var.image_source == "public" ? var.publisher : ""
-    offer     = var.image_source == "public" ? var.offer : ""
-    sku       = var.image_source == "public" ? var.sku : ""
-    version   = var.image_source == "public" ? var.os_version : ""
+  # Use conditional logic to set image source
+  dynamic "source_image_reference" {
+    for_each = var.image_source == "public" ? [1] : []
+    content {
+      publisher = var.publisher
+      offer     = var.offer
+      sku       = var.sku
+      version   = var.os_version
+    }
   }
+
+  source_image_id = var.image_source == "private" ? var.private_image_id : null
 }
 
 # Managed disk for the VM
@@ -131,7 +133,7 @@ resource "azurerm_managed_disk" "hcmxexample" {
 # Data disk attachment for the VM
 resource "azurerm_virtual_machine_data_disk_attachment" "hcmxexample" {
   managed_disk_id    = azurerm_managed_disk.hcmxexample.id
-  virtual_machine_id = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample[0].id : azurerm_windows_virtual_machine.hcmxexample[0].id
+  virtual_machine_id = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample.id : azurerm_windows_virtual_machine.hcmxexample.id
   lun                = 10
   caching            = "ReadWrite"
 }
@@ -154,7 +156,7 @@ output "primary_dns_name" {
 }
 
 output "virtual_machine_id" {
-  value = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample[0].id : azurerm_windows_virtual_machine.hcmxexample[0].id
+  value = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample.id : azurerm_windows_virtual_machine.hcmxexample.id
 }
 
 output "data_disk_name" {

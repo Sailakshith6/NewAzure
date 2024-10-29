@@ -57,15 +57,6 @@ resource "azurerm_network_interface" "hcmxexample" {
   }
 }
 
-# Random string for unique suffix
-resource "random_string" "unique_suffix" {
-  length  = 8
-  upper   = false
-  lower   = true
-  numeric = true # Updated from 'number' to 'numeric'
-  special = false
-}
-
 # Linux VM configuration
 resource "azurerm_linux_virtual_machine" "hcmxexample" {
   name                = var.vm_name
@@ -84,9 +75,7 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
     storage_account_type = var.type_of_storage
   }
 
-  # Conditional image source for Linux
-  source_image_id = var.image_source == "private" ? var.private_image_id : null
-
+  # Use conditional logic to set image source
   dynamic "source_image_reference" {
     for_each = var.image_source == "public" ? [1] : []
     content {
@@ -96,6 +85,8 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
       version   = var.os_version
     }
   }
+
+  source_image_id = var.image_source == "private" ? var.private_image_id : null
 }
 
 # Windows VM configuration
@@ -115,9 +106,7 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
     storage_account_type = var.type_of_storage
   }
 
-  # Conditional image source for Windows
-  source_image_id = var.image_source == "private" ? var.private_image_id : null
-
+  # Use conditional logic to set image source
   dynamic "source_image_reference" {
     for_each = var.image_source == "public" ? [1] : []
     content {
@@ -127,6 +116,8 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
       version   = var.os_version
     }
   }
+
+  source_image_id = var.image_source == "private" ? var.private_image_id : null
 }
 
 # Managed disk for the VM

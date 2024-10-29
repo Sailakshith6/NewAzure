@@ -59,6 +59,7 @@ resource "azurerm_network_interface" "hcmxexample" {
 
 # Linux VM configuration
 resource "azurerm_linux_virtual_machine" "hcmxexample" {
+  count               = var.os_type == "linux" ? 1 : 0  # This line was initially incorrect
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location
@@ -80,16 +81,16 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
 
   # Only include this block if using a public image
   source_image_reference {
-    count     = var.image_source == "public" ? 1 : 0
-    publisher = var.publisher
-    offer     = var.offer
-    sku       = var.sku
-    version   = var.os_version
+    publisher = var.image_source == "public" ? var.publisher : ""
+    offer     = var.image_source == "public" ? var.offer : ""
+    sku       = var.image_source == "public" ? var.sku : ""
+    version   = var.image_source == "public" ? var.os_version : ""
   }
 }
 
 # Windows VM configuration
 resource "azurerm_windows_virtual_machine" "hcmxexample" {
+  count               = var.os_type == "windows" ? 1 : 0  # This line was initially incorrect
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location
@@ -110,11 +111,10 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
 
   # Only include this block if using a public image
   source_image_reference {
-    count     = var.image_source == "public" ? 1 : 0
-    publisher = var.publisher
-    offer     = var.offer
-    sku       = var.sku
-    version   = var.os_version
+    publisher = var.image_source == "public" ? var.publisher : ""
+    offer     = var.image_source == "public" ? var.offer : ""
+    sku       = var.image_source == "public" ? var.sku : ""
+    version   = var.image_source == "public" ? var.os_version : ""
   }
 }
 
@@ -131,7 +131,7 @@ resource "azurerm_managed_disk" "hcmxexample" {
 # Data disk attachment for the VM
 resource "azurerm_virtual_machine_data_disk_attachment" "hcmxexample" {
   managed_disk_id    = azurerm_managed_disk.hcmxexample.id
-  virtual_machine_id = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample.id : azurerm_windows_virtual_machine.hcmxexample.id
+  virtual_machine_id = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample[0].id : azurerm_windows_virtual_machine.hcmxexample[0].id
   lun                = 10
   caching            = "ReadWrite"
 }
@@ -154,7 +154,7 @@ output "primary_dns_name" {
 }
 
 output "virtual_machine_id" {
-  value = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample.id : azurerm_windows_virtual_machine.hcmxexample.id
+  value = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample[0].id : azurerm_windows_virtual_machine.hcmxexample[0].id
 }
 
 output "data_disk_name" {

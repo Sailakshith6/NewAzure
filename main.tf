@@ -21,13 +21,22 @@ data "azurerm_resource_group" "hcmxexample" {
   name = var.resource_group_name
 }
 
+# Generate a random string for a unique DNS label
+resource "random_string" "unique_suffix" {
+  length  = 8
+  upper   = false
+  lower   = true
+  number  = true
+  special = false
+}
+
 # Public IP configuration
 resource "azurerm_public_ip" "hcmxexample" {
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location
   allocation_method   = "Dynamic"
-  domain_name_label   = var.domain_name_label
+  domain_name_label   = "${var.domain_name_label}-${random_string.unique_suffix.result}" # Unique DNS label
 }
 
 # Virtual network data source

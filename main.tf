@@ -76,21 +76,14 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
     storage_account_type = var.type_of_storage
   }
   
-  dynamic "source_image_reference" {
-    for_each = var.image_source == "public" ? [1] : []
-    content {
-      publisher = var.publisher
-      offer     = var.offer
-      sku       = var.sku
-      version   = var.os_version
-    }
-  }
-  
-  dynamic "source_image_id" {
-    for_each = var.image_source == "private" ? [1] : []
-    content {
-      id = var.private_image_id
-    }
+  # Conditional image source for Linux
+  source_image_id = var.image_source == "private" ? var.private_image_id : null
+
+  source_image_reference {
+    publisher = var.image_source == "public" ? var.publisher : ""
+    offer     = var.image_source == "public" ? var.offer : ""
+    sku       = var.image_source == "public" ? var.sku : ""
+    version   = var.image_source == "public" ? var.os_version : ""
   }
 }
 
@@ -111,22 +104,15 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
   }
-  
-  dynamic "source_image_reference" {
-    for_each = var.image_source == "public" ? [1] : []
-    content {
-      publisher = var.publisher
-      offer     = var.offer
-      sku       = var.sku
-      version   = var.os_version
-    }
-  }
-  
-  dynamic "source_image_id" {
-    for_each = var.image_source == "private" ? [1] : []
-    content {
-      id = var.private_image_id
-    }
+
+  # Conditional image source for Windows
+  source_image_id = var.image_source == "private" ? var.private_image_id : null
+
+  source_image_reference {
+    publisher = var.image_source == "public" ? var.publisher : ""
+    offer     = var.image_source == "public" ? var.offer : ""
+    sku       = var.image_source == "public" ? var.sku : ""
+    version   = var.image_source == "public" ? var.os_version : ""
   }
 }
 

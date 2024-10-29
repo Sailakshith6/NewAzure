@@ -16,10 +16,12 @@ provider "azurerm" {
   tenant_id       = var.tenant_id
 }
 
+# Data source for the resource group
 data "azurerm_resource_group" "hcmxexample" {
   name = var.resource_group_name
 }
 
+# Public IP configuration
 resource "azurerm_public_ip" "hcmxexample" {
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
@@ -28,17 +30,20 @@ resource "azurerm_public_ip" "hcmxexample" {
   domain_name_label   = var.domain_name_label
 }
 
+# Virtual network data source
 data "azurerm_virtual_network" "hcmxexample" {
   name                = var.virtual_network
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
 }
 
+# Subnet data source
 data "azurerm_subnet" "hcmxexample" {
   name                 = var.subnet
   resource_group_name  = data.azurerm_resource_group.hcmxexample.name
   virtual_network_name = data.azurerm_virtual_network.hcmxexample.name
 }
 
+# Network interface for the VM
 resource "azurerm_network_interface" "hcmxexample" {
   name                = var.vm_name
   location            = var.location
@@ -52,49 +57,46 @@ resource "azurerm_network_interface" "hcmxexample" {
   }
 }
 
-# Determine the source of the image (public or private)
+# Linux VM configuration
 resource "azurerm_linux_virtual_machine" "hcmxexample" {
-  count               = var.os_type == "linux" && var.image_source == "public" ? 1 : 0
+  count               = var.os_type == "linux" ? 1 : 0
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location
   size                = var.vm_size
   admin_username      = var.vm_username
   admin_password      = var.password
+  disable_password_authentication = false
   network_interface_ids = [
     azurerm_network_interface.hcmxexample.id,
   ]
-
+  
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
   }
-
-  source_image_reference {
-    publisher = var.publisher
-    offer     = var.offer
-    sku       = var.sku
-    version   = var.os_version
+  
+  dynamic "source_image_reference" {
+    for_each = var.image_source == "public" ? [1] : []
+    content {
+      publisher = var.publisher
+      offer     = var.offer
+      sku       = var.sku
+      version   = var.os_version
+    }
+  }
+  
+  dynamic "source_image_id" {
+    for_each = var.image_source == "private" ? [1] : []
+    content {
+      id = var.private_image_id
+    }
   }
 }
 
-resource "azurerm_private_image" "hcmxexample" {
-  count               = var.os_type == "linux" && var.image_source == "private" ? 1 : 0
-  name                = var.vm_name
-  resource_group_name = data.azurerm_resource_group.hcmxexample.name
-  location            = var.location
-  source_image_reference {
-    id = var.private_image_id
-  }
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = var.type_of_storage
-  }
-}
-
+# Windows VM configuration
 resource "azurerm_windows_virtual_machine" "hcmxexample" {
-  count               = var.os_type == "windows" && var.image_source == "public" ? 1 : 0
+  count               = var.os_type == "windows" ? 1 : 0
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location
@@ -104,35 +106,31 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
   network_interface_ids = [
     azurerm_network_interface.hcmxexample.id,
   ]
-
+  
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
   }
-
-  source_image_reference {
-    publisher = var.publisher
-    offer     = var.offer
-    sku       = var.sku
-    version   = var.os_version
+  
+  dynamic "source_image_reference" {
+    for_each = var.image_source == "public" ? [1] : []
+    content {
+      publisher = var.publisher
+      offer     = var.offer
+      sku       = var.sku
+      version   = var.os_version
+    }
+  }
+  
+  dynamic "source_image_id" {
+    for_each = var.image_source == "private" ? [1] : []
+    content {
+      id = var.private_image_id
+    }
   }
 }
 
-resource "azurerm_private_windows_image" "hcmxexample" {
-  count               = var.os_type == "windows" && var.image_source == "private" ? 1 : 0
-  name                = var.vm_name
-  resource_group_name = data.azurerm_resource_group.hcmxexample.name
-  location            = var.location
-  source_image_reference {
-    id = var.private_image_id
-  }
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = var.type_of_storage
-  }
-}
-
+# Managed disk for the VM
 resource "azurerm_managed_disk" "hcmxexample" {
   name                 = "${var.vm_name}-disk"
   location             = var.location
@@ -142,15 +140,29 @@ resource "azurerm_managed_disk" "hcmxexample" {
   disk_size_gb         = var.disk_size
 }
 
+# Data disk attachment for the VM
 resource "azurerm_virtual_machine_data_disk_attachment" "hcmxexample" {
   managed_disk_id    = azurerm_managed_disk.hcmxexample.id
   virtual_machine_id = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample[0].id : azurerm_windows_virtual_machine.hcmxexample[0].id
-  lun                = "10"
+  lun                = 10
   caching            = "ReadWrite"
 }
 
+# Public IP data source
+data "azurerm_public_ip" "hcmxexample" {
+  name                = var.vm_name
+  resource_group_name = data.azurerm_resource_group.hcmxexample.name
+}
+
+# Network interface data source
+data "azurerm_network_interface" "hcmxexample" {
+  name                = var.vm_name
+  resource_group_name = data.azurerm_resource_group.hcmxexample.name
+}
+
+# Output variables
 output "public_ip_address" {
-  value = azurerm_public_ip.hcmxexample.ip_address
+  value = data.azurerm_public_ip.hcmxexample.ip_address
 }
 
 output "network_interface_name" {
@@ -158,11 +170,11 @@ output "network_interface_name" {
 }
 
 output "private_ip_address" {
-  value = azurerm_network_interface.hcmxexample.private_ip_address
+  value = data.azurerm_network_interface.hcmxexample.private_ip_address
 }
 
 output "primary_dns_name" {
-  value = azurerm_public_ip.hcmxexample.fqdn
+  value = data.azurerm_public_ip.hcmxexample.fqdn
 }
 
 output "virtual_machine_id" {
@@ -172,4 +184,3 @@ output "virtual_machine_id" {
 output "data_disk_name" {
   value = azurerm_managed_disk.hcmxexample.name
 }
-

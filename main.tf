@@ -59,7 +59,6 @@ resource "azurerm_network_interface" "hcmxexample" {
 
 # Linux VM configuration
 resource "azurerm_linux_virtual_machine" "hcmxexample" {
-  count               = var.os_type == "linux" ? 1 : 0
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location
@@ -91,7 +90,6 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
 
 # Windows VM configuration
 resource "azurerm_windows_virtual_machine" "hcmxexample" {
-  count               = var.os_type == "windows" ? 1 : 0
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location
@@ -133,7 +131,7 @@ resource "azurerm_managed_disk" "hcmxexample" {
 # Data disk attachment for the VM
 resource "azurerm_virtual_machine_data_disk_attachment" "hcmxexample" {
   managed_disk_id    = azurerm_managed_disk.hcmxexample.id
-  virtual_machine_id = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample[0].id : azurerm_windows_virtual_machine.hcmxexample[0].id
+  virtual_machine_id = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample.id : azurerm_windows_virtual_machine.hcmxexample.id
   lun                = 10
   caching            = "ReadWrite"
 }
@@ -156,7 +154,7 @@ output "primary_dns_name" {
 }
 
 output "virtual_machine_id" {
-  value = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample[0].id : azurerm_windows_virtual_machine.hcmxexample[0].id
+  value = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample.id : azurerm_windows_virtual_machine.hcmxexample.id
 }
 
 output "data_disk_name" {

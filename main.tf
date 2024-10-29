@@ -79,11 +79,13 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
   # Conditional image source for Linux
   source_image_id = var.image_source == "private" ? var.private_image_id : null
 
+  # Only include this block if using a public image
   source_image_reference {
-    publisher = var.image_source == "public" ? var.publisher : ""
-    offer     = var.image_source == "public" ? var.offer : ""
-    sku       = var.image_source == "public" ? var.sku : ""
-    version   = var.image_source == "public" ? var.os_version : ""
+    count     = var.image_source == "public" ? 1 : 0
+    publisher = var.publisher
+    offer     = var.offer
+    sku       = var.sku
+    version   = var.os_version
   }
 }
 
@@ -108,11 +110,13 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
   # Conditional image source for Windows
   source_image_id = var.image_source == "private" ? var.private_image_id : null
 
+  # Only include this block if using a public image
   source_image_reference {
-    publisher = var.image_source == "public" ? var.publisher : ""
-    offer     = var.image_source == "public" ? var.offer : ""
-    sku       = var.image_source == "public" ? var.sku : ""
-    version   = var.image_source == "public" ? var.os_version : ""
+    count     = var.image_source == "public" ? 1 : 0
+    publisher = var.publisher
+    offer     = var.offer
+    sku       = var.sku
+    version   = var.os_version
   }
 }
 
@@ -134,21 +138,9 @@ resource "azurerm_virtual_machine_data_disk_attachment" "hcmxexample" {
   caching            = "ReadWrite"
 }
 
-# Public IP data source
-data "azurerm_public_ip" "hcmxexample" {
-  name                = var.vm_name
-  resource_group_name = data.azurerm_resource_group.hcmxexample.name
-}
-
-# Network interface data source
-data "azurerm_network_interface" "hcmxexample" {
-  name                = var.vm_name
-  resource_group_name = data.azurerm_resource_group.hcmxexample.name
-}
-
 # Output variables
 output "public_ip_address" {
-  value = data.azurerm_public_ip.hcmxexample.ip_address
+  value = azurerm_public_ip.hcmxexample.ip_address
 }
 
 output "network_interface_name" {
@@ -156,11 +148,11 @@ output "network_interface_name" {
 }
 
 output "private_ip_address" {
-  value = data.azurerm_network_interface.hcmxexample.private_ip_address
+  value = azurerm_network_interface.hcmxexample.private_ip_address
 }
 
 output "primary_dns_name" {
-  value = data.azurerm_public_ip.hcmxexample.fqdn
+  value = azurerm_public_ip.hcmxexample.fqdn
 }
 
 output "virtual_machine_id" {

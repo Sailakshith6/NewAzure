@@ -50,8 +50,8 @@ resource "azurerm_virtual_machine" "example" {
 
   os_profile {
     computer_name  = var.vm_name
-    admin_username = var.admin_username
-    admin_password = var.admin_password
+    admin_username = var.vm_username
+    admin_password = var.password
   }
 
   os_profile_linux_config {
@@ -60,6 +60,6 @@ resource "azurerm_virtual_machine" "example" {
 
   # Use the storage_image_reference block to set the image ID
   storage_image_reference {
-    id = var.image_id  # Use the variable here
+    id = var.private_image_id  # Use the variable here
   }
 }

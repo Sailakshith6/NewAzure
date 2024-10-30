@@ -135,7 +135,7 @@ resource "azurerm_managed_disk" "hcmxexample" {
 # Data disk attachment for the VM
 resource "azurerm_virtual_machine_data_disk_attachment" "hcmxexample" {
   managed_disk_id    = azurerm_managed_disk.hcmxexample.id
-  virtual_machine_id = var.os_type=="linux" ? azurerm_linux_virtual_machine.hcmxexample[count.index]].id : azurerm_windows_virtual_machine.hcmxexample[count.index]].id
+  virtual_machine_id = var.os_type=="linux" ? azurerm_linux_virtual_machine.hcmxexample[count.index].id : azurerm_windows_virtual_machine.hcmxexample[count.index].id
   lun                = count.index
   caching            = "ReadWrite"
 }

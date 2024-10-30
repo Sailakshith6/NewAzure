@@ -38,7 +38,8 @@ resource "azurerm_public_ip" "example" {
   name                = "${var.vm_name}-public-ip"
   location            = var.location
   resource_group_name = data.azurerm_resource_group.example.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"  # Change to Static for Standard SKU
+  sku                 = "Standard"  # Specify SKU
 }
 
 resource "azurerm_linux_virtual_machine" "linux_example" {

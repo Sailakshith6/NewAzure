@@ -59,6 +59,7 @@ resource "azurerm_network_interface" "hcmxexample" {
 
 # Linux VM configuration
 resource "azurerm_linux_virtual_machine" "hcmxexample" {
+  count = var.os_type=="linux" ? 1 : 0
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location
@@ -91,6 +92,7 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
 
 # Windows VM configuration
 resource "azurerm_windows_virtual_machine" "hcmxexample" {
+  count = var.os_type=="windows" ? 1 : 0
   name                = var.vm_name
   resource_group_name = data.azurerm_resource_group.hcmxexample.name
   location            = var.location

@@ -124,7 +124,7 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
 
 # Managed disk for the VM
 resource "azurerm_managed_disk" "hcmxexample" {
-  #name                 = "${var.vm_name}-disk"
+  name                 = "${var.vm_name}-disk"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.hcmxexample.name
   storage_account_type = var.type_of_storage

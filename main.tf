@@ -158,6 +158,10 @@ output "primary_dns_name" {
 }
 
 output "virtual_machine_id" {
+  value = var.os_type=="linux" ? azurerm_linux_virtual_machine.hcmxexample[0].virtual_machine_id : azurerm_windows_virtual_machine.hcmxexample[0].virtual_machine_id
+}
+output "cloud_instance_id" {
+  value = var.os_type=="linux" ? azurerm_linux_virtual_machine.hcmxexample[0].id : azurerm_windows_virtual_machine.hcmxexample[0].id
   value = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample.id : azurerm_windows_virtual_machine.hcmxexample.id
 }
 

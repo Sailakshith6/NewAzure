@@ -9,7 +9,6 @@ provider "azurerm" {
 
 data "azurerm_resource_group" "example" {
   name     = var.resource_group_name
-  location = var.location
 }
 
 data "azurerm_virtual_network" "example" {
@@ -25,7 +24,7 @@ data "azurerm_subnet" "example" {
 
 resource "azurerm_network_interface" "example" {
   name                = "${var.vm_name}-nic"
-  location            = data.azurerm_resource_group.example.location
+  location            =  var.location
   resource_group_name = data.azurerm_resource_group.example.name
 
   ip_configuration {
@@ -37,7 +36,7 @@ resource "azurerm_network_interface" "example" {
 
 resource "azurerm_virtual_machine" "example" {
   name                  = var.vm_name
-  location              = data.azurerm_resource_group.example.location
+  location              = var.location
   resource_group_name   = data.azurerm_resource_group.example.name
   network_interface_ids = [azurerm_network_interface.example.id]
   vm_size               = var.vm_size

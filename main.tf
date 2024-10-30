@@ -68,7 +68,6 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
-    # Source image configuration for private image
     source_image_id      = var.private_image_id  # Use the resource ID of your private image
   }
 }
@@ -88,7 +87,6 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
-    # Source image configuration for private image
     source_image_id      = var.private_image_id  # Use the resource ID of your private image
   }
 }
@@ -100,6 +98,7 @@ resource "azurerm_managed_disk" "additional_disk" {
   resource_group_name  = data.azurerm_resource_group.hcmxexample.name
   storage_account_type = var.type_of_storage
   disk_size_gb        = var.disk_size  # Size for the additional data disk
+  create_option        = "Empty"        # Set to create an empty managed disk
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "hcmxexample" {

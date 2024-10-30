@@ -39,19 +39,16 @@ resource "azurerm_linux_virtual_machine" "example" {
   location              = var.location
   resource_group_name   = data.azurerm_resource_group.example.name
   network_interface_ids = [azurerm_network_interface.example.id]
-  vm_size               = var.vm_size
+  size               = var.vm_size
   admin_username      = var.vm_username
   admin_password      = var.password
+  disable_password_authentication = false
 
-  storage_os_disk {
+  os_disk {
     name              = "${var.vm_name}-osdisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"  # This is correct as we are creating from an image
     managed_disk_type = "Premium_LRS"
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = false
   }
 
   # Use the storage_image_reference block to set the image ID

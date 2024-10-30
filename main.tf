@@ -116,5 +116,5 @@ output "linux_virtual_machine_id" {
 }
 
 output "windows_virtual_machine_id" {
-  value = azurerm_windows_virtual_machine.windows_example[0].id
+  value = length(azurerm_windows_virtual_machine.windows_example) > 0 ? azurerm_windows_virtual_machine.windows_example[0].id : null
 }

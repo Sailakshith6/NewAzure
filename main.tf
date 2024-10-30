@@ -68,10 +68,9 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
-    #create_option        = "FromImage"
+    # Source image configuration for private image
+    source_image_id      = var.private_image_id  # Use the resource ID of your private image
   }
-
-  source_image_id = var.private_image_id  # Use the resource ID of the private image
 }
 
 resource "azurerm_windows_virtual_machine" "hcmxexample" {
@@ -89,40 +88,30 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
-   # create_option        = "FromImage"
+    # Source image configuration for private image
+    source_image_id      = var.private_image_id  # Use the resource ID of your private image
   }
-
-  source_image_id = var.private_image_id  # Use the resource ID of the private image
 }
 
-resource "azurerm_managed_disk" "hcmxexample" {
-  name                 = "${var.vm_name}-disk"
+resource "azurerm_managed_disk" "additional_disk" {
+  count                = var.attach_data_disk ? 1 : 0  # Only create if specified
+  name                 = "${var.vm_name}-data-disk"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.hcmxexample.name
   storage_account_type = var.type_of_storage
-  create_option        = "Empty"
-  disk_size_gb        = var.disk_size
+  disk_size_gb        = var.disk_size  # Size for the additional data disk
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "hcmxexample" {
-  managed_disk_id    = azurerm_managed_disk.hcmxexample.id
+  count = var.attach_data_disk ? 1 : 0  # Only attach if specified
+  managed_disk_id    = azurerm_managed_disk.additional_disk[count.index].id
   virtual_machine_id = var.os_type == "linux" ? azurerm_linux_virtual_machine.hcmxexample[0].id : azurerm_windows_virtual_machine.hcmxexample[0].id
-  lun                = 10
+  lun                = 1  # Start from 1 for additional disks
   caching            = "ReadWrite"
 }
 
-data "azurerm_public_ip" "hcmxexample" {
-  name                = var.vm_name
-  resource_group_name = data.azurerm_resource_group.hcmxexample.name
-}
-
-data "azurerm_network_interface" "hcmxexample" {
-  name                = var.vm_name
-  resource_group_name = data.azurerm_resource_group.hcmxexample.name
-}
-
 output "public_ip_address" {
-  value = data.azurerm_public_ip.hcmxexample.ip_address
+  value = azurerm_public_ip.hcmxexample.ip_address
 }
 
 output "network_interface_name" {
@@ -130,11 +119,11 @@ output "network_interface_name" {
 }
 
 output "private_ip_address" {
-  value = data.azurerm_network_interface.hcmxexample.private_ip_address
+  value = azurerm_network_interface.hcmxexample.private_ip_address
 }
 
 output "primary_dns_name" {
-  value = data.azurerm_public_ip.hcmxexample.fqdn
+  value = azurerm_public_ip.hcmxexample.fqdn
 }
 
 output "virtual_machine_id" {
@@ -146,5 +135,5 @@ output "cloud_instance_id" {
 }
 
 output "data_disk_name" {
-  value = azurerm_managed_disk.hcmxexample.name
+  value = var.attach_data_disk ? azurerm_managed_disk.additional_disk[0].name : "No data disk attached"
 }

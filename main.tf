@@ -74,6 +74,7 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
+    create_option        = "FromImage" 
   }
 
   # Use conditional logic to set image source

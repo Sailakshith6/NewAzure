@@ -71,9 +71,7 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
     create_option        = "FromImage"  # Use FromImage for OS disks
   }
 
-  source_image_reference {
-    id = var.private_image_id  # Use the resource ID of your private image
-  }
+    source_image_id = var.private_image_id  # Use the resource ID of your private image
 }
 
 resource "azurerm_windows_virtual_machine" "hcmxexample" {
@@ -94,9 +92,7 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
     create_option        = "FromImage"  # Use FromImage for OS disks
   }
 
-  source_image_reference {
-    id = var.private_image_id  # Use the resource ID of your private image
-  }
+  source_image_id = var.private_image_id  # Use the resource ID of your private image
 }
 
 resource "azurerm_managed_disk" "additional_disk" {

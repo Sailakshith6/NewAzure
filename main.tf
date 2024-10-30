@@ -68,7 +68,7 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
-    create_option        = "FromImage"
+    #create_option        = "FromImage"
   }
 
   source_image_id = var.private_image_id  # Use the resource ID of the private image
@@ -89,7 +89,7 @@ resource "azurerm_windows_virtual_machine" "hcmxexample" {
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
-    create_option        = "FromImage"
+   # create_option        = "FromImage"
   }
 
   source_image_id = var.private_image_id  # Use the resource ID of the private image

@@ -52,13 +52,13 @@ resource "azurerm_linux_virtual_machine" "linux_example" {
   admin_password       = var.password
   disable_password_authentication = false
 
+  # Use this for private image
+  source_image_id = var.private_image_id
+
   os_disk {
     name                = "${var.vm_name}-osdisk"
     caching             = "ReadWrite"
     storage_account_type = "Premium_LRS"
-
-    # Use this for private image
-    source_image_id = var.private_image_id
   }
 }
 
@@ -71,15 +71,13 @@ resource "azurerm_windows_virtual_machine" "windows_example" {
   size                 = var.vm_size
   admin_username       = var.vm_username
   admin_password       = var.password
-  disable_password_authentication = false
+  # Use this for private image
+  source_image_id = var.private_image_id
 
   os_disk {
     name                = "${var.vm_name}-osdisk"
     caching             = "ReadWrite"
     storage_account_type = "Premium_LRS"
-
-    # Use this for private image
-    source_image_id = var.private_image_id
   }
 }
 
@@ -90,6 +88,7 @@ resource "azurerm_managed_disk" "additional_disk" {
   resource_group_name  = data.azurerm_resource_group.example.name
   storage_account_type = "Premium_LRS"
   disk_size_gb        = var.disk_size
+  create_option       = "Empty"  # Specify the create_option
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {

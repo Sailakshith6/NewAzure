@@ -1,6 +1,6 @@
 provider "azurerm" {
   features {}
-  # Required properties for Azure authentication
+
   subscription_id = var.subscription_id
   client_id       = var.client_id
   client_secret   = var.client_secret
@@ -48,27 +48,34 @@ resource "azurerm_linux_virtual_machine" "example" {
     name                = "${var.vm_name}-osdisk"
     caching             = "ReadWrite"
     storage_account_type = "Premium_LRS"
-    create_option       = "FromImage"  # Indicates that the disk is created from an image
-    source_image_id     = var.private_image_id  # Use the variable here
+    
+    # Reference the private image ID directly
+    source_image_id     = var.private_image_id
   }
 }
 
+resource "azurerm_public_ip" "example" {
+  name                = "${var.vm_name}-public-ip"
+  location            = var.location
+  resource_group_name = data.azurerm_resource_group.example.name
+  allocation_method   = "Dynamic"
+}
+
 resource "azurerm_managed_disk" "additional_disk" {
-  count                = var.attach_data_disk ? 1 : 0  # Only create if specified
+  count                = var.attach_data_disk ? 1 : 0
   name                 = "${var.vm_name}-data-disk"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.example.name
-  storage_account_type = "Premium_LRS"  # Corrected the quotes
-  create_option        = "Empty"
-  disk_size_gb        = var.disk_size  # Size for the additional data disk
+  storage_account_type = "Premium_LRS"
+  disk_size_gb        = var.disk_size  # Specify disk size
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "example" {
-  count               = var.attach_data_disk ? 1 : 0  # Only attach if specified
+  count               = var.attach_data_disk ? 1 : 0
   managed_disk_id    = azurerm_managed_disk.additional_disk[count.index].id
-  virtual_machine_id = azurerm_linux_virtual_machine.example.id
-  lun                = 1  # Start from 1 for additional disks
-  caching            = "ReadWrite"
+  virtual_machine_id  = azurerm_linux_virtual_machine.example.id
+  lun                 = 1  # Start from 1 for additional disks
+  caching             = "ReadWrite"
 }
 
 output "public_ip_address" {

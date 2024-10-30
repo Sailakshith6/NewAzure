@@ -12,7 +12,7 @@ data "azurerm_resource_group" "example" {
   location = var.location
 }
 
-ddata "azurerm_virtual_network" "example" {
+data "azurerm_virtual_network" "example" {
   name                = var.virtual_network
   resource_group_name = data.azurerm_resource_group.example.name
 }

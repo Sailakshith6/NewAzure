@@ -72,7 +72,7 @@ resource "azurerm_linux_virtual_machine" "hcmxexample" {
   ]
   
   os_disk {
-    caching              = "ReadWrite"
+    #caching              = "ReadWrite"
     storage_account_type = var.type_of_storage
   }
 
@@ -136,7 +136,7 @@ resource "azurerm_managed_disk" "hcmxexample" {
 resource "azurerm_virtual_machine_data_disk_attachment" "hcmxexample" {
   managed_disk_id    = azurerm_managed_disk.hcmxexample.id
   virtual_machine_id = var.os_type=="linux" ? azurerm_linux_virtual_machine.hcmxexample[0].id : azurerm_windows_virtual_machine.hcmxexample[0].id
-  lun                = 1
+  lun                = "10"
   caching            = "ReadWrite"
 }
 

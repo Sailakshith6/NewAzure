@@ -47,8 +47,7 @@ resource "azurerm_linux_virtual_machine" "example" {
   os_disk {
     name              = "${var.vm_name}-osdisk"
     caching           = "ReadWrite"
-    create_option     = "FromImage"  # This is correct as we are creating from an image
-    managed_disk_type = "Premium_LRS"
+    storage_account_type = "Premium_LRS"
   }
 
   # Use the storage_image_reference block to set the image ID

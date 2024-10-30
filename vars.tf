@@ -48,19 +48,19 @@ variable "password" {
 variable "os_type" {
   description = "The operating system type (linux or windows)."
   type        = string
-  default     = "linux"  # Default can be set to either 'linux' or 'windows'
+  # default     = "linux"  # Default can be set to either 'linux' or 'windows'
 }
 
 variable "image_source" {
   description = "The source of the VM image (public or private)."
   type        = string
-  default     = "public"
+  # default     = "public"
 }
 
 variable "private_image_id" {
   description = "The ID of the private image to use if the image source is private."
   type        = string
-  default     = ""  # Leave empty if not using a private image
+  # default     = ""  # Leave empty if not using a private image
 }
 
 variable "virtual_network" {
@@ -76,7 +76,7 @@ variable "subnet" {
 variable "vm_size" {
   description = "The size of the virtual machine."
   type        = string
-  default     = "Standard_DS1_v2"  # Example VM size
+  # default     = "Standard_DS1_v2"  # Example VM size
 }
 
 variable "domain_name_label" {
@@ -87,7 +87,7 @@ variable "domain_name_label" {
 variable "type_of_storage" {
   description = "The type of storage for the OS disk (Standard_LRS, Premium_LRS, etc.)."
   type        = string
-  default     = "Standard_LRS"  # Default storage type
+  # default     = "Standard_LRS"  # Default storage type
 }
 
 variable "publisher" {

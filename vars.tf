@@ -119,5 +119,5 @@ variable "disk_size" {
 variable "attach_data_disk" {
   description = "Flag to attach an additional data disk"
   type        = bool
-  #default     = false  # Set to true if you want to attach a data disk
+  default     = true  # Set to true if you want to attach a data disk
 }

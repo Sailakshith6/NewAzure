@@ -34,7 +34,7 @@ resource "azurerm_network_interface" "example" {
   }
 }
 
-resource "azurerm_virtual_machine" "example" {
+resource "azurerm_linux_virtual_machine" "example" {
   name                  = var.vm_name
   location              = var.location
   resource_group_name   = data.azurerm_resource_group.example.name
@@ -59,7 +59,7 @@ resource "azurerm_virtual_machine" "example" {
   }
 
   # Use the storage_image_reference block to set the image ID
-  storage_image_reference {
-    id = var.private_image_id  # Use the variable here
-  }
+  #source_image_reference  {
+    source_image_id = var.private_image_id  # Use the variable here
+  
 }

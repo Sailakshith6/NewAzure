@@ -49,6 +49,7 @@ resource "azurerm_public_ip" "example" {
   resource_group_name = data.azurerm_resource_group.example.name
   allocation_method   = "Dynamic"
   sku                 = "Basic"
+  domain_name_label   = "${var.domain_name_label}-${random_string.vm_suffix.result}"
 }
 
 resource "azurerm_linux_virtual_machine" "linux_example" {

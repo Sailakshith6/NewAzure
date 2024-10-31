@@ -6,8 +6,8 @@ output "vm_name" {
   value = var.os_type == "linux" ? azurerm_linux_virtual_machine.linux_example[0].name : azurerm_windows_virtual_machine.windows_example[0].name
 }
 
-output "public_ip_address" {
-  value = azurerm_public_ip.example.ip_address
+output "public_ip_addresses" {
+  value = azurerm_public_ip.example[*].ip_address  # Returns a list of all IP addresses
 }
 
 output "network_interface_name" {

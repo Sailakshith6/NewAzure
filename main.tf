@@ -50,6 +50,11 @@ resource "azurerm_public_ip" "example" {
   allocation_method   = "Dynamic"
   sku                 = "Basic"
   domain_name_label   = "${var.domain_name_label}-${random_string.vm_suffix.result}"
+
+ timeouts {
+    create = "10m"  # Wait up to 10 minutes for the creation of the public IP
+    delete = "10m"  # Wait up to 10 minutes for the deletion of the public IP
+  }
 }
 
 resource "azurerm_linux_virtual_machine" "linux_example" {

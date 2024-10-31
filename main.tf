@@ -139,3 +139,7 @@ output "cloud_instance_id" {
 output "data_disk_name" {
   value = var.attach_data_disk ? azurerm_managed_disk.additional_disk[0].name : null
 }
+
+output "os_disk_name" {
+  value = var.os_type == "linux" ? azurerm_linux_virtual_machine.linux_example[0].os_disk[0].name : azurerm_windows_virtual_machine.windows_example[0].os_disk[0].name
+}

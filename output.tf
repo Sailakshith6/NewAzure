@@ -7,7 +7,7 @@ output "vm_name" {
 }
 
 output "public_ip_addresses" {
-  value = azurerm_public_ip.example[*].ip_address  # Returns a list of all IP addresses
+  value = azurerm_public_ip.example.ip_address  # Returns a list of all IP addresses
 }
 
 output "network_interface_name" {
@@ -19,7 +19,7 @@ output "private_ip_address" {
 }
 
 output "primary_dns_names" {
-  value = azurerm_public_ip.example[*].fqdn  # Returns a list of all FQDNs
+  value = azurerm_public_ip.example.fqdn  # Returns a list of all FQDNs
 }
 
 output "virtual_machine_id" {

@@ -47,7 +47,7 @@ resource "azurerm_public_ip" "example" {
   location            = var.location
   resource_group_name = data.azurerm_resource_group.example.name
   allocation_method   = var.image_source == "public" ? "Dynamic" : "Static"  # Dynamic for public images
-  #sku                 = var.image_source == "private" ? "Standard" : null      # Standard SKU for private, null for public
+  sku                 = "Standard"
 }
 
 resource "azurerm_linux_virtual_machine" "linux_example" {

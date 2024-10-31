@@ -43,7 +43,6 @@ resource "azurerm_network_interface" "example" {
 }
 
 resource "azurerm_public_ip" "example" {
-  count               = var.image_source == "private" ? 1 : 0
   name                = "${var.vm_name}-${random_string.vm_suffix.result}-public-ip"
   location            = var.location
   resource_group_name = data.azurerm_resource_group.example.name

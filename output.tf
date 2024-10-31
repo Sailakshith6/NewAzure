@@ -18,8 +18,8 @@ output "private_ip_address" {
   value = azurerm_network_interface.example.private_ip_address
 }
 
-output "primary_dns_name" {
-  value = azurerm_public_ip.example.fqdn
+output "primary_dns_names" {
+  value = azurerm_public_ip.example[*].fqdn  # Returns a list of all FQDNs
 }
 
 output "virtual_machine_id" {

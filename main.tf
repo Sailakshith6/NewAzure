@@ -1,3 +1,11 @@
+provider "random" {}
+
+resource "random_string" "vm_suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 provider "azurerm" {
   features {}
 
@@ -23,28 +31,28 @@ data "azurerm_subnet" "example" {
 }
 
 resource "azurerm_network_interface" "example" {
-  name                = "${var.vm_name}-nic"
+  name                = "${var.vm_name}-${random_string.vm_suffix.result}-nic"
   location            = var.location
   resource_group_name = data.azurerm_resource_group.example.name
 
   ip_configuration {
-    name                          = "internal"
+    name                          = "${var.vm_name}-${random_string.vm_suffix.result}"
     subnet_id                     = data.azurerm_subnet.example.id
     private_ip_address_allocation = "Dynamic"
   }
 }
 
 resource "azurerm_public_ip" "example" {
-  name                = "${var.vm_name}-public-ip"
+  name                = "${var.vm_name}-${random_string.vm_suffix.result}-public-ip"
   location            = var.location
   resource_group_name = data.azurerm_resource_group.example.name
-  allocation_method   = "Static"  # Change to Static for Standard SKU
+  allocation_method   = var.image_source == "public" ? "Dynamic" : "Static"  # Dynamic for public images
   sku                 = "Standard"  # Specify SKU
 }
 
 resource "azurerm_linux_virtual_machine" "linux_example" {
   count                = var.os_type == "linux" ? 1 : 0
-  name                 = var.vm_name
+  name                 = "${var.vm_name}-${random_string.vm_suffix.result}"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.example.name
   network_interface_ids = [azurerm_network_interface.example.id]
@@ -68,15 +76,15 @@ resource "azurerm_linux_virtual_machine" "linux_example" {
   }
 
   os_disk {
-    name                = "${var.vm_name}-osdisk"
+    name                = "${var.vm_name}-${random_string.vm_suffix.result}-osdisk"
     caching             = "ReadWrite"
-    storage_account_type = "Premium_LRS"
+    storage_account_type = var.type_of_storage
   }
 }
 
 resource "azurerm_windows_virtual_machine" "windows_example" {
   count                = var.os_type == "windows" ? 1 : 0
-  name                 = var.vm_name
+  name                 = "${var.vm_name}-${random_string.vm_suffix.result}"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.example.name
   network_interface_ids = [azurerm_network_interface.example.id]
@@ -88,18 +96,18 @@ resource "azurerm_windows_virtual_machine" "windows_example" {
   source_image_id = var.image_source == "public" ? null : var.private_image_id
 
   os_disk {
-    name                = "${var.vm_name}-osdisk"
+    name                = "${var.vm_name}-${random_string.vm_suffix.result}-osdisk"
     caching             = "ReadWrite"
-    storage_account_type = "Premium_LRS"
+    storage_account_type = var.type_of_storage
   }
 }
 
 resource "azurerm_managed_disk" "additional_disk" {
   count                = var.attach_data_disk ? 1 : 0
-  name                 = "${var.vm_name}-data-disk"
+  name                 = "${var.vm_name}-${random_string.vm_suffix.result}-data-disk"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.example.name
-  storage_account_type = "Premium_LRS"
+  storage_account_type = var.type_of_storage
   disk_size_gb        = var.disk_size
   create_option       = "Empty"  # Specify the create_option
 }

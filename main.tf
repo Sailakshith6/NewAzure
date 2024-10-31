@@ -109,6 +109,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
   managed_disk_id    = azurerm_managed_disk.additional_disk[count.index].id
   virtual_machine_id  = var.os_type == "linux" ? azurerm_linux_virtual_machine.linux_example[0].id : azurerm_windows_virtual_machine.windows_example[0].id
   lun                 = 1  # Start from 1 for additional disks
+  caching             = "ReadWrite"  # Specify caching option
 }
 
 output "public_ip_address" {
@@ -136,5 +137,5 @@ output "cloud_instance_id" {
 }
 
 output "data_disk_name" {
-  value = azurerm_managed_disk.additional_disk[count.index].name
+  value = var.attach_data_disk ? azurerm_managed_disk.additional_disk[0].name : null
 }

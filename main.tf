@@ -36,7 +36,7 @@ resource "azurerm_network_interface" "example" {
   resource_group_name = data.azurerm_resource_group.example.name
 
   ip_configuration {
-    name                          = "internal"
+    name                          = "${var.vm_name}-${random_string.vm_suffix.result}"
     subnet_id                     = data.azurerm_subnet.example.id
     private_ip_address_allocation = "Dynamic"
   }
@@ -48,8 +48,8 @@ resource "azurerm_public_ip" "example" {
   location            = var.location
   resource_group_name = data.azurerm_resource_group.example.name
 
-  allocation_method   = var.image_source == "private" ? "Static" : "Dynamic"
-  sku                 = var.image_source == "private" ? "Standard" : null
+  allocation_method   = "Dynamic"
+  sku                 =  null
 }
 
 resource "azurerm_linux_virtual_machine" "linux_example" {

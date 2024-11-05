@@ -153,9 +153,7 @@ resource "azurerm_managed_disk" "additional_disk" {
 resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
   count               = var.attach_data_disk ? 1 : 0
   managed_disk_id    = azurerm_managed_disk.additional_disk[count.index].id
-  virtual_machine_id  = var.os_type == "linux" 
-    ? (var.image_source == "public" ? azurerm_linux_virtual_machine.linux_example_public[0].id : azurerm_linux_virtual_machine.linux_example_private[0].id)
-    : (var.image_source == "public" ? azurerm_windows_virtual_machine.windows_example_public[0].id : azurerm_windows_virtual_machine.windows_example_private[0].id)
+  virtual_machine_id  = var.os_type == "linux" ? (var.image_source == "public" ? azurerm_linux_virtual_machine.linux_example_public[0].id : azurerm_linux_virtual_machine.linux_example_private[0].id) : (var.image_source == "public" ? azurerm_windows_virtual_machine.windows_example_public[0].id : azurerm_windows_virtual_machine.windows_example_private[0].id)
   lun                 = 1  # Start from 1 for additional disks
   caching             = "ReadWrite"  # Specify caching option
 }

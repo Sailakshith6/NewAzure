@@ -23,7 +23,7 @@ output "primary_dns_name" {
 }
 
 output "virtual_machine_id" {
-  value = var.os_type == "linux" && var.image_source == "public" ? azurerm_linux_virtual_machine.linux_example_public[0].id : var.os_type == "linux" && var.image_source == "private" ? azurerm_linux_virtual_machine.linux_example_private[0].id : var.os_type == "windows" && var.image_source == "public" ? azurerm_windows_virtual_machine.windows_example_public[0].id : azurerm_windows_virtual_machine.windows_example_private[0].id
+  value = var.os_type == "linux" && var.image_source == "public" && length(azurerm_linux_virtual_machine.linux_example_public) > 0 ? azurerm_linux_virtual_machine.linux_example_public[0].id : var.os_type == "linux" && var.image_source == "private" && length(azurerm_linux_virtual_machine.linux_example_private) > 0 ? azurerm_linux_virtual_machine.linux_example_private[0].id : var.os_type == "windows" && var.image_source == "public" && length(azurerm_windows_virtual_machine.windows_example_public) > 0 ? azurerm_windows_virtual_machine.windows_example_public[0].id : var.os_type == "windows" && var.image_source == "private" && length(azurerm_windows_virtual_machine.windows_example_private) > 0 ? azurerm_windows_virtual_machine.windows_example_private[0].id : null
 }
 
 output "cloud_instance_id" {

@@ -3,7 +3,7 @@ output "os_disk_name" {
 }
 
 output "virtual_machine_name" {
-  value = var.os_type == "linux" && var.image_source == "public" ? azurerm_linux_virtual_machine.linux_example_public[0].name : var.os_type == "linux" && var.image_source == "private" ? azurerm_linux_virtual_machine.linux_example_private[0].name : var.os_type == "windows" && var.image_source == "public" ? azurerm_windows_virtual_machine.windows_example_public[0].name : azurerm_windows_virtual_machine.windows_example_private[0].name
+  value = var.os_type == "linux" && var.image_source == "public" && length(azurerm_linux_virtual_machine.linux_example_public) > 0 ? azurerm_linux_virtual_machine.linux_example_public[0].name : var.os_type == "linux" && var.image_source == "private" && length(azurerm_linux_virtual_machine.linux_example_private) > 0 ? azurerm_linux_virtual_machine.linux_example_private[0].name : var.os_type == "windows" && var.image_source == "public" && length(azurerm_windows_virtual_machine.windows_example_public) > 0 ? azurerm_windows_virtual_machine.windows_example_public[0].name : var.os_type == "windows" && var.image_source == "private" && length(azurerm_windows_virtual_machine.windows_example_private) > 0 ? azurerm_windows_virtual_machine.windows_example_private[0].name : null  # Return null if no applicable VM is found
 }
 
 output "public_ip_address" {

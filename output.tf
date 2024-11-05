@@ -10,6 +10,10 @@ output "public_ip_address" {
   value = azurerm_public_ip.example.ip_address  # Returns a list of all IP addresses
 }
 
+output "public_ip_address_name" {
+  value = azurerm_public_ip.example.name  # Returns a list of all IP addresses
+}
+
 output "network_interface_name" {
   value = azurerm_network_interface.example.name
 }

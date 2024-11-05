@@ -70,8 +70,11 @@ resource "azurerm_linux_virtual_machine" "linux_example" {
 
   # Use public image if the variable is set to "public"
   dynamic "source_image_id" {
-    source_image_id = (var.image_source == "public") ? null : var.private_image_id
+  for_each = var.image_source == "private" ? [1] : []
+  content {
+    source_image_id = var.private_image_id
   }
+}
   
 
   # Use public image reference if using public image

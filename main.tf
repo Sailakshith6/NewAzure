@@ -57,8 +57,8 @@ resource "azurerm_public_ip" "example" {
   }
 }
 
-resource "azurerm_linux_virtual_machine" "linux_example" {
-  count                = var.os_type == "linux" ? 1 : 0
+resource "azurerm_linux_virtual_machine" "linux_example_public" {
+  count               = var.os_type == "linux" && var.image_source == "public" ? 1 : 0
   name                 = "${var.vm_name}-${random_string.vm_suffix.result}"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.example.name
@@ -67,10 +67,6 @@ resource "azurerm_linux_virtual_machine" "linux_example" {
   admin_username       = var.vm_username
   admin_password       = var.password
   disable_password_authentication = false
-
-  # Use public image if the variable is set to "public"
-  source_image_id = var.image_source == "private" ? var.private_image_id : ""
-  
 
   # Use public image reference if using public image
   dynamic "source_image_reference" {
@@ -90,8 +86,27 @@ resource "azurerm_linux_virtual_machine" "linux_example" {
   }
 }
 
-resource "azurerm_windows_virtual_machine" "windows_example" {
-  count                = var.os_type == "windows" ? 1 : 0
+resource "azurerm_linux_virtual_machine" "linux_example_private" {
+  count               = var.os_type == "linux" && var.image_source == "private" ? 1 : 0
+  name                 = "${var.vm_name}-${random_string.vm_suffix.result}"
+  location             = var.location
+  resource_group_name  = data.azurerm_resource_group.example.name
+  network_interface_ids = [azurerm_network_interface.example.id]
+  size                 = var.vm_size
+  admin_username       = var.vm_username
+  admin_password       = var.password
+  disable_password_authentication = false
+  source_image_id     = var.private_image_id
+
+  os_disk {
+    name                = "${var.vm_name}-${random_string.vm_suffix.result}-osdisk"
+    caching             = "ReadWrite"
+    storage_account_type = var.type_of_storage
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "windows_example_public" {
+  count               = var.os_type == "windows" && var.image_source == "public" ? 1 : 0
   name                 = "${var.vm_name}-${random_string.vm_suffix.result}"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.example.name
@@ -100,8 +115,23 @@ resource "azurerm_windows_virtual_machine" "windows_example" {
   admin_username       = var.vm_username
   admin_password       = var.password
 
-  # Use public image if the variable is set to "public"
-  source_image_id = var.image_source == "public" ? null : var.private_image_id
+  os_disk {
+    name                = "${var.vm_name}-${random_string.vm_suffix.result}-osdisk"
+    caching             = "ReadWrite"
+    storage_account_type = var.type_of_storage
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "windows_example_private" {
+  count               = var.os_type == "windows" && var.image_source == "private" ? 1 : 0
+  name                 = "${var.vm_name}-${random_string.vm_suffix.result}"
+  location             = var.location
+  resource_group_name  = data.azurerm_resource_group.example.name
+  network_interface_ids = [azurerm_network_interface.example.id]
+  size                 = var.vm_size
+  admin_username       = var.vm_username
+  admin_password       = var.password
+  source_image_id     = var.private_image_id
 
   os_disk {
     name                = "${var.vm_name}-${random_string.vm_suffix.result}-osdisk"
@@ -123,7 +153,9 @@ resource "azurerm_managed_disk" "additional_disk" {
 resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
   count               = var.attach_data_disk ? 1 : 0
   managed_disk_id    = azurerm_managed_disk.additional_disk[count.index].id
-  virtual_machine_id  = var.os_type == "linux" ? azurerm_linux_virtual_machine.linux_example[0].id : azurerm_windows_virtual_machine.windows_example[0].id
+  virtual_machine_id  = var.os_type == "linux" 
+    ? (var.image_source == "public" ? azurerm_linux_virtual_machine.linux_example_public[0].id : azurerm_linux_virtual_machine.linux_example_private[0].id)
+    : (var.image_source == "public" ? azurerm_windows_virtual_machine.windows_example_public[0].id : azurerm_windows_virtual_machine.windows_example_private[0].id)
   lun                 = 1  # Start from 1 for additional disks
   caching             = "ReadWrite"  # Specify caching option
 }

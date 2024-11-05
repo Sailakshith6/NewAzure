@@ -115,6 +115,17 @@ resource "azurerm_windows_virtual_machine" "windows_example_public" {
   admin_username       = var.vm_username
   admin_password       = var.password
 
+  # Use public image reference if using public image
+    dynamic "source_image_reference" {
+      for_each = var.image_source == "public" ? [1] : []
+      content {
+        publisher = var.publisher
+        offer     = var.offer
+        sku       = var.sku
+        version   = var.os_version
+      }
+    }
+
   os_disk {
     name                = "${var.vm_name}-${random_string.vm_suffix.result}-osdisk"
     caching             = "ReadWrite"

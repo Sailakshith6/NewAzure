@@ -69,7 +69,7 @@ resource "azurerm_linux_virtual_machine" "linux_example" {
   disable_password_authentication = false
 
   # Use public image if the variable is set to "public"
-  source_image_id = var.image_source == "private" ? var.private_image_id : null
+  source_image_id = var.image_source == "private" ? var.private_image_id : ""
   
 
   # Use public image reference if using public image

@@ -1,11 +1,3 @@
-provider "random" {}
-
-resource "random_string" "vm_suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
-
 provider "azurerm" {
   features {}
 
@@ -31,12 +23,12 @@ data "azurerm_subnet" "example" {
 }
 
 resource "azurerm_network_interface" "example" {
-  name                = "${var.vm_name}-${random_string.vm_suffix.result}-nic"
+  name                = "${var.vm_name}-nic"
   location            = var.location
   resource_group_name = data.azurerm_resource_group.example.name
 
   ip_configuration {
-    name                          = "${var.vm_name}-${random_string.vm_suffix.result}"
+    name                          = "${var.vm_name}"
     subnet_id                     = data.azurerm_subnet.example.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id = azurerm_public_ip.example.id
@@ -44,12 +36,12 @@ resource "azurerm_network_interface" "example" {
 }
 
 resource "azurerm_public_ip" "example" {
-  name                = "${var.vm_name}-${random_string.vm_suffix.result}-public-ip"
+  name                = "${var.vm_name}-public-ip"
   location            = var.location
   resource_group_name = data.azurerm_resource_group.example.name
   allocation_method   = "Dynamic"
   sku                 = "Basic"
-  domain_name_label   = "${var.domain_name_label}-${random_string.vm_suffix.result}"
+  domain_name_label   = "${var.domain_name_label}"
 
  timeouts {
     create = "10m"  # Wait up to 10 minutes for the creation of the public IP
@@ -59,7 +51,7 @@ resource "azurerm_public_ip" "example" {
 
 resource "azurerm_linux_virtual_machine" "linux_example" {
   count                = var.os_type == "linux" ? 1 : 0
-  name                 = "${var.vm_name}-${random_string.vm_suffix.result}"
+  name                 = "${var.vm_name}"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.example.name
   network_interface_ids = [azurerm_network_interface.example.id]
@@ -83,7 +75,7 @@ resource "azurerm_linux_virtual_machine" "linux_example" {
   }
 
   os_disk {
-    name                = "${var.vm_name}-${random_string.vm_suffix.result}-osdisk"
+    name                = "${var.vm_name}-osdisk"
     caching             = "ReadWrite"
     storage_account_type = var.type_of_storage
   }
@@ -91,7 +83,7 @@ resource "azurerm_linux_virtual_machine" "linux_example" {
 
 resource "azurerm_windows_virtual_machine" "windows_example" {
   count                = var.os_type == "windows" ? 1 : 0
-  name                 = "${var.vm_name}-${random_string.vm_suffix.result}"
+  name                 = "${var.vm_name}"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.example.name
   network_interface_ids = [azurerm_network_interface.example.id]
@@ -103,7 +95,7 @@ resource "azurerm_windows_virtual_machine" "windows_example" {
   source_image_id = var.image_source == "public" ? null : var.private_image_id
 
   os_disk {
-    name                = "${var.vm_name}-${random_string.vm_suffix.result}-osdisk"
+    name                = "${var.vm_name}-osdisk"
     caching             = "ReadWrite"
     storage_account_type = var.type_of_storage
   }
@@ -111,7 +103,7 @@ resource "azurerm_windows_virtual_machine" "windows_example" {
 
 resource "azurerm_managed_disk" "additional_disk" {
   count                = var.attach_data_disk ? 1 : 0
-  name                 = "${var.vm_name}-${random_string.vm_suffix.result}-data-disk"
+  name                 = "${var.vm_name}-data-disk"
   location             = var.location
   resource_group_name  = data.azurerm_resource_group.example.name
   storage_account_type = var.type_of_storage

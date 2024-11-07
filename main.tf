@@ -94,6 +94,16 @@ resource "azurerm_windows_virtual_machine" "windows_example" {
   # Use public image if the variable is set to "public"
   source_image_id = var.image_source == "public" ? null : var.private_image_id
 
+  # Use public image reference if using public image
+  dynamic "source_image_reference" {
+    for_each = var.image_source == "public" ? [1] : []
+    content {
+      publisher = var.publisher
+      offer     = var.offer
+      sku       = var.sku
+      version   = var.os_version
+    }
+  }
   os_disk {
     name                = "${var.vm_name}-osdisk"
     caching             = "ReadWrite"

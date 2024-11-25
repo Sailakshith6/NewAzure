@@ -121,3 +121,9 @@ variable "attach_data_disk" {
   type        = bool
   default     = true  # Set to true if you want to attach a data disk
 }
+
+variable "component_type" {
+  description = "Component type of ESM"
+  type        = string
+  default     = SERVER
+}

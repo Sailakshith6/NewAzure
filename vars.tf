@@ -125,5 +125,5 @@ variable "attach_data_disk" {
 variable "component_type" {
   description = "Component type of ESM"
   type        = string
-  default     = SERVER
+  default     = "SERVER"
 }
